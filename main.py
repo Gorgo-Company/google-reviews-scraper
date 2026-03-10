@@ -25,20 +25,15 @@ def scrape(request: ScrapeRequest):
     Runs the Google Reviews scraper for a single URL
     and returns overall rating + top 10 reviews.
     """
-    # make a temp output filename so parallel calls don't clash
     run_id = uuid.uuid4().hex
     json_path = Path(f"google_reviews_{run_id}.json")
-    ids_path = Path(f"google_reviews_{run_id}.ids")
 
-    # Build the command to run the scraper
-    # This assumes start.py is in the repo root and supports these flags.
-        cmd = [
-            "python",
-            "start.py",
-            "--url",
-            request.url,
-        ]
-
+    cmd = [
+        "python",
+        "start.py",
+        "--url",
+        request.url,
+    ]
 
     try:
         result = subprocess.run(
@@ -46,13 +41,12 @@ def scrape(request: ScrapeRequest):
             check=False,
             capture_output=True,
             text=True,
-            timeout=180,  # 3 minutes
+            timeout=180,
         )
     except subprocess.TimeoutExpired:
         raise HTTPException(status_code=504, detail="Scraper timed out")
 
     if result.returncode != 0:
-        # include some stderr to help debug
         raise HTTPException(status_code=500, detail=f"Scraper failed: {result.stderr[:500]}")
 
     if not json_path.exists():
@@ -61,12 +55,9 @@ def scrape(request: ScrapeRequest):
     reviews = load_reviews_from_json(str(json_path))
     summary = summarize_reviews(reviews, place_name=request.place_name or "")
 
-    # optional: clean up temp files
     try:
         json_path.unlink(missing_ok=True)
-        ids_path.unlink(missing_ok=True)
     except Exception:
         pass
 
     return summary
-
