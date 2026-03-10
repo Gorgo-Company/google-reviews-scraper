@@ -32,18 +32,13 @@ def scrape(request: ScrapeRequest):
 
     # Build the command to run the scraper
     # This assumes start.py is in the repo root and supports these flags.
-    cmd = [
+       cmd = [
         "python",
         "start.py",
         "--url",
         request.url,
-        "--headless", "true",
-        "--backup_to_json", "true",
-        "--json_path",
-        str(json_path),
-        "--seen_ids_path",
-        str(ids_path),
     ]
+
 
     try:
         result = subprocess.run(
