@@ -32,12 +32,12 @@ def scrape(request: ScrapeRequest):
 
     # Build the command to run the scraper
     # This assumes start.py is in the repo root and supports these flags.
-       cmd = [
-        "python",
-        "start.py",
-        "--url",
-        request.url,
-    ]
+        cmd = [
+            "python",
+            "start.py",
+            "--url",
+            request.url,
+        ]
 
 
     try:
